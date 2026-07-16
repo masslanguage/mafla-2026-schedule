@@ -3,13 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MAFLA 2026 — Session Browser</title>
-<link rel="manifest" href="manifest.json">
+<title>MAFLA 2026 Conference</title>
 <meta name="theme-color" content="#5c1526">
 <link rel="apple-touch-icon" href="icon-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="MAFLA 2026">
 <style>
   :root {
     --navy: #5c1526;
@@ -31,498 +27,155 @@
   header {
     background: var(--navy);
     color: white;
-    padding: 2rem 1.5rem 1.5rem;
+    padding: 3.5rem 1.5rem 3rem;
     text-align: center;
   }
-  header h1 { margin: 0 0 0.3rem; font-size: 1.7rem; }
-  header p.sub { margin: 0; opacity: 0.85; font-size: 0.95rem; }
-  header p.theme { margin: 0.5rem 0 0; font-style: italic; opacity: 0.75; font-size: 0.9rem; }
+  header .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.8rem;
+    opacity: 0.75;
+    margin-bottom: 0.5rem;
+  }
+  header h1 { margin: 0 0 0.4rem; font-size: 2.1rem; }
+  header p.sub { margin: 0; opacity: 0.9; font-size: 1.05rem; }
+  header p.theme { margin: 0.75rem 0 0; font-style: italic; opacity: 0.8; font-size: 0.95rem; }
 
-  .day-tabs {
-    display: flex; justify-content: center; gap: 0.5rem;
-    background: var(--navy); padding: 0 1.5rem 1rem;
-  }
-  .day-tab {
-    padding: 0.5rem 1.4rem; border-radius: 999px; border: 1px solid rgba(255,255,255,0.4);
-    background: transparent; color: white; cursor: pointer; font-weight: 600; font-size: 0.9rem;
-  }
-  .day-tab.active { background: var(--gold); border-color: var(--gold); }
-
-  .controls {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    padding: 1rem 1.5rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    align-items: center;
-  }
-  .controls input[type=text] {
-    flex: 1 1 220px;
-    padding: 0.55rem 0.8rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 0.95rem;
-  }
-  .controls select {
-    padding: 0.55rem 0.6rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 0.9rem;
-    background: white;
-  }
-  .toggle-btn {
-    padding: 0.55rem 0.9rem;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: white;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 600;
-    white-space: nowrap;
-  }
-  .toggle-btn.active {
-    background: var(--gold);
-    color: white;
-    border-color: var(--gold);
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 3rem;
   }
 
-  main { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1.5rem 4rem; }
-
-  .my-schedule {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 2rem;
-  }
-  .my-schedule h2 { margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--navy); }
-  .my-schedule h3 { margin: 1rem 0 0.4rem; font-size: 0.9rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
-  .my-schedule .empty { color: var(--muted); font-size: 0.9rem; }
-  .my-schedule ul { list-style: none; margin: 0; padding: 0; }
-  .my-schedule li {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; gap: 0.5rem;
-  }
-  .my-schedule li:last-child { border-bottom: none; }
-  .conflict-warning {
-    background: #fdecea; border: 1px solid #e6a29b; color: #8a2c22;
-    padding: 0.6rem 0.9rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 0.75rem;
-  }
-  .my-actions { display: flex; gap: 0.6rem; margin-top: 1rem; flex-wrap: wrap; }
-
-  .btn {
-    display: inline-block; padding: 0.6rem 1.1rem; border-radius: 8px;
-    background: var(--accent); color: white; text-decoration: none; border: none;
-    font-weight: 600; font-size: 0.88rem; cursor: pointer;
-  }
-  .btn:hover { background: #6e1527; }
-  .btn.secondary { background: var(--navy); }
-  .btn.secondary:hover { background: #3d0f1a; }
-  .btn:disabled { background: #ccc; cursor: not-allowed; }
-  .btn.small { padding: 0.3rem 0.7rem; font-size: 0.78rem; }
-  .btn.feedback-btn { background: var(--gold); }
-  .btn.feedback-btn:hover { background: #a3801f; }
-
-  .block-header {
-    margin: 2rem 0 0.75rem;
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--navy);
-    border-bottom: 2px solid var(--navy);
-    padding-bottom: 0.35rem;
-  }
-  .break-row {
-    margin: 1rem 0;
-    padding: 0.6rem 1rem;
-    background: #eee9dd;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    color: var(--muted);
-    font-style: italic;
-    text-align: center;
-  }
-
-  .grid {
+  .cards {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
   }
   .card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 1rem 1.1rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    cursor: pointer;
-    transition: box-shadow 0.15s ease, transform 0.1s ease;
-    position: relative;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.75rem 1.5rem;
+    text-decoration: none;
+    color: var(--text);
+    transition: box-shadow 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
   }
-  .card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.08); transform: translateY(-1px); }
-  .card h3 { margin: 0; font-size: 1rem; color: var(--navy); padding-right: 1.7rem; line-height: 1.3; }
-  .card .meta { font-size: 0.82rem; color: var(--muted); }
-  .card .meta strong { color: var(--text); }
-  .badges { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-  .badge {
-    font-size: 0.72rem; padding: 0.15rem 0.5rem; border-radius: 999px;
-    background: #f3e6e9; color: var(--navy); font-weight: 600;
+  .card:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+    border-color: var(--gold);
   }
-  .badge.lang { background: #f4ecd8; color: var(--gold); }
-  .star-btn {
-    position: absolute; top: 0.7rem; right: 0.7rem;
-    background: none; border: none; font-size: 1.3rem; cursor: pointer;
-    color: #ccc; line-height: 1;
-  }
-  .star-btn.bookmarked { color: var(--gold); }
-  .no-results { text-align: center; color: var(--muted); padding: 2rem; font-style: italic; }
+  .card .icon { font-size: 1.8rem; }
+  .card h2 { margin: 0; font-size: 1.15rem; color: var(--navy); }
+  .card p { margin: 0; font-size: 0.9rem; color: var(--muted); line-height: 1.4; }
+  .card .arrow { margin-top: 0.5rem; font-weight: 700; color: var(--accent); font-size: 0.9rem; }
 
-  .modal-overlay {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-    z-index: 100; align-items: center; justify-content: center; padding: 1.5rem;
+  .card.primary {
+    background: var(--navy);
+    border-color: var(--navy);
   }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: white; border-radius: 12px; max-width: 560px; width: 100%;
-    max-height: 85vh; overflow-y: auto; padding: 1.75rem;
-    position: relative;
-  }
-  .modal-close {
-    position: absolute; top: 0.9rem; right: 1rem; background: none; border: none;
-    font-size: 1.4rem; cursor: pointer; color: var(--muted);
-  }
-  .modal h2 { margin: 0 0 0.5rem; color: var(--navy); font-size: 1.25rem; padding-right: 1.5rem; }
-  .modal .meta-row { font-size: 0.9rem; color: var(--muted); margin-bottom: 0.15rem; }
-  .modal .desc { margin-top: 1rem; line-height: 1.6; font-size: 0.95rem; }
-  .modal .modal-actions { display: flex; gap: 0.6rem; margin-top: 1.25rem; flex-wrap: wrap; }
+  .card.primary h2, .card.primary p { color: white; }
+  .card.primary p { opacity: 0.85; }
+  .card.primary .arrow { color: var(--gold); }
 
-  footer { text-align: center; font-size: 0.8rem; color: #8a8a8a; padding: 1.5rem 0 2.5rem; }
+  .info-strip {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem 1.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: space-between;
+    font-size: 0.9rem;
+  }
+  .info-strip div strong {
+    display: block;
+    color: var(--navy);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+  }
+
+  footer {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #8a8a8a;
+    padding: 1.5rem 0 2.5rem;
+  }
+  footer a { color: var(--muted); }
 </style>
 </head>
 <body>
 
 <header>
+  <div class="eyebrow">Massachusetts Foreign Language Association</div>
   <h1>MAFLA 2026 Conference</h1>
-  <p class="sub">Session Browser — Friday, Oct 30 &amp; Saturday, Oct 31, 2026</p>
+  <p class="sub">Friday, October 30 &amp; Saturday, October 31, 2026</p>
   <p class="theme">"Fostering a Sense of Belonging Through Multilingualism"</p>
 </header>
 
-<div class="day-tabs">
-  <button class="day-tab active" data-day="Friday" onclick="setDay('Friday')">Friday, Oct 30</button>
-  <button class="day-tab" data-day="Saturday" onclick="setDay('Saturday')">Saturday, Oct 31</button>
-</div>
-
-<div class="controls">
-  <input type="text" id="searchBox" placeholder="Search sessions, presenters, rooms...">
-  <select id="blockFilter"></select>
-  <select id="langFilter">
-    <option value="">All languages</option>
-  </select>
-  <button class="toggle-btn" id="bookmarkToggle">★ Bookmarked only</button>
-</div>
-
 <main>
-  <div class="my-schedule" id="mySchedule">
-    <h2>My Schedule</h2>
-    <div id="myScheduleContent"><p class="empty">You haven't bookmarked any sessions yet. Click the star on any session to add it here.</p></div>
+  <div class="cards">
+    <a class="card primary" href="schedule.html">
+      <div class="icon">📅</div>
+      <h2>Browse Sessions &amp; Build Your Schedule</h2>
+      <p>Search Friday and Saturday sessions, read full descriptions, bookmark your picks, and export them straight to your calendar.</p>
+      <span class="arrow">Open the Session Browser →</span>
+    </a>
+
+    <a class="card" href="https://docs.google.com/forms/d/e/1FAIpQLSc7vybgZTLB3XjepSjHbfSw_HEpnacEtvtB7GOOcRGOaKH-bw/viewform?usp=sharing" target="_blank" rel="noopener">
+      <div class="icon">💬</div>
+      <h2>Give Us Feedback</h2>
+      <p>Attended a session? Let the presenter and MAFLA know what you thought.</p>
+      <span class="arrow">Open Feedback Form →</span>
+    </a>
+
+    <a class="card" href="https://mafla.org" target="_blank" rel="noopener">
+      <div class="icon">🏠</div>
+      <h2>MAFLA Main Site</h2>
+      <p>Membership, year-round events, and everything else MAFLA.</p>
+      <span class="arrow">Visit mafla.org →</span>
+    </a>
+
+    <a class="card" href="venue.html">
+      <div class="icon">📍</div>
+      <h2>Venue Information</h2>
+      <p>Location, parking, hotel room block, Wi-Fi, and accessibility details.</p>
+      <span class="arrow">View Venue Info →</span>
+    </a>
+
+    <a class="card" href="faqs.html">
+      <div class="icon">❓</div>
+      <h2>FAQs</h2>
+      <p>Registration, PDPs, meals, and other common questions answered.</p>
+      <span class="arrow">View FAQs →</span>
+    </a>
+
+    <a class="card" href="sponsors.html">
+      <div class="icon">🤝</div>
+      <h2>Sponsors</h2>
+      <p>The organizations supporting MAFLA 2026.</p>
+      <span class="arrow">View Sponsors →</span>
+    </a>
   </div>
 
-  <div id="sessionList"></div>
-  <p class="no-results" id="noResults" style="display:none;">No sessions match your search/filters.</p>
+  <div class="info-strip">
+    <div><strong>Dates</strong>Fri, Oct 30 &ndash; Sat, Oct 31, 2026</div>
+    <div><strong>Sessions</strong>40+ across both days</div>
+    <div><strong>Format</strong>In-person, all rooms on-site</div>
+  </div>
 </main>
 
-<footer>Massachusetts Foreign Language Association — MAFLA 2026 · Times shown in conference local time (Eastern)</footer>
+<footer>
+  Massachusetts Foreign Language Association — MAFLA 2026
+</footer>
 
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal" id="modalContent"></div>
-</div>
-
-<script>
-const DATA = {"sessions": [{"id": "s1", "day": "Friday", "date": "2026-10-30", "block": "A", "start": "09:00", "end": "10:00", "title": "Building Classroom Culture Through Collaboration", "presenter": "Jessica Kaplan", "room": "Meeting Room 1", "language": "English", "desc": "Even with strong structures in place, students need to feel comfortable taking risks, sharing ideas, and holding one another accountable. In this session, we’ll explore how to build a classroom environment where collaboration is expected, supported, and productive. You’ll walk away with practical ways to foster trust, increase student buy-in, and reinforce the habits that lead to improved participation and a stronger class culture."}, {"id": "s2", "day": "Friday", "date": "2026-10-30", "block": "A", "start": "09:00", "end": "10:00", "title": "Shifting from \"Learning About\" to \"Learning Through\" Cultures", "presenter": "Vilma Nasuti Bibeau", "room": "Meeting Room 2", "language": "English", "desc": "This session explores integrating cultural authenticity and competence into district curricula using the updated NCSSFL-ACTFL Intercultural Can-Do Statements. Move beyond surface-level facts toward deep critical inquiry and community-centered learning. By leveraging authentic tasks and the lived experiences of target-language communities—both globally and locally—we transform language from a mere object of study into a powerful tool for social navigation, justice, and belonging. Empower students to investigate historical drivers and interact with genuine cultural proficiency."}, {"id": "s3", "day": "Friday", "date": "2026-10-30", "block": "A", "start": "09:00", "end": "10:00", "title": "Stop English Switching: Designing Tasks That Keep Students in Target Languages", "presenter": "Xiaohui Cao", "room": "Meeting Room 3", "language": "English", "desc": "A common challenge in WL classrooms: students often switch from the target language to English due to task design issues related to cognitive load, interaction, and output demands. Participants will learn to design structured speaking tasks that sustain target language use while supporting confidence and belonging. Through side-by-side task comparisons, participants will identify changes in cognitive load and communication success. Brief pair discussions follow to analyze what changed. Participants then redesign one classroom task for immediate use."}, {"id": "s4", "day": "Friday", "date": "2026-10-30", "block": "A", "start": "09:00", "end": "10:00", "title": "Carlos V", "presenter": "", "room": "Session Room E", "language": "English", "desc": ""}, {"id": "s5", "day": "Friday", "date": "2026-10-30", "block": "A", "start": "09:00", "end": "10:00", "title": "From Zero to Hero: Routines for Equity and Participation", "presenter": "Olivia Barbieri-Feeney", "room": "Session Room F", "language": "English", "desc": "Looking to improve participation for all students? Let’s explore how Thinking Routines from Harvard’s Project Zero and Classroom Routines from the book “Differentiated Instruction Made Practical” (Bondie & Akane) support equitable participation among students and foster a sense of belonging. Participants will engage in examples from a high school Spanish class and leave inspired with concrete routines and materials to use in the classroom next week!"}, {"id": "s6", "day": "Friday", "date": "2026-10-30", "block": "A", "start": "09:00", "end": "10:00", "title": "Cut the Crust, Add the Spice: A Recipe for Curriculum Tune-Up", "presenter": "Zach Bagan", "room": "Salon A", "language": "English", "desc": "Want to strengthen your curriculum without throwing it out and starting over? Whether you are bound to a textbook, facing other limitations, or simply in need of inspiration, let's unpack a functional framework to enhance any curriculum you might be using. By combining research-based strategies and teacher intuition, this session will encourage participants to explore a practical makeover process and begin brainstorming an action plan to \"spice up\" units and lessons. Teachers will leave with useful tools, fresh ideas, and a clear path toward refining the curriculum they are working with."}, {"id": "s7", "day": "Friday", "date": "2026-10-30", "block": "A", "start": "09:00", "end": "10:00", "title": "Bringing Writing to Life: Genre, Interaction, and Purpose", "presenter": "Catherine Ritz", "room": "Salon B", "language": "English", "desc": "Discover how writing and speaking come together to build purposeful communication in the proficiency-based classroom. In this interactive session, you’ll explore how students strengthen their writing skills by talking through ideas, collaborating, and revising in the target language. Grounded in a genre-based approach and the Gradual Release of Responsibility (GRR) Framework, this session highlights practical strategies that connect writing to meaningful interaction. Walk away with classroom-ready ideas you can apply immediately to support students in producing more authentic, effective writing while engaging in real-world communication."}, {"id": "s8", "day": "Friday", "date": "2026-10-30", "block": "A", "start": "09:00", "end": "10:00", "title": "We Practiced Vocabulary—Now What?", "presenter": "Emily Squires", "room": "Salon C", "language": "English", "desc": "We practiced the vocab—now what? Students may ace quizzes on 40+ word lists yet lack the words to share personal ideas. In this hands-on session, you’ll experience a simple input→output cycle: structured input (“Which sentence makes sense?”), daily retrieval, and supports like chat mats and sentence ladders. We’ll analyze student samples, then you’ll redesign one vocab activity into a proficiency-aligned task. Leave with editable templates and strategies to recycle high-utility, identity-relevant vocabulary so every learner can communicate and belong."}, {"id": "s9", "day": "Friday", "date": "2026-10-30", "block": "B", "start": "10:30", "end": "11:30", "title": "Mapping Belonging: From Campus to Community", "presenter": "Maria Datel", "room": "Meeting Room 1", "language": "Spanish", "desc": "How can language classrooms foster belonging while developing proficiency and civic awareness? This interactive session presents two place-based, community-engaged projects that center multilingual identities within and beyond the university campus. Students interview Spanish speakers, craft narrative reflections, and explore how identity shifts across spaces and social contexts. Grounded in proficiency-based teaching, Universal Design for Learning, and culturally responsive pedagogy, these projects position students as active participants in their communities through multimodal storytelling and reflection. Participants will experience a sample activity and leave with adaptable strategies to design inclusive, community-connected tasks that promote linguistic development and belonging."}, {"id": "s10", "day": "Friday", "date": "2026-10-30", "block": "B", "start": "10:30", "end": "11:30", "title": "Everything I Learned About Teaching, I Learned in Dance Class", "presenter": "Ryan Casey", "room": "Meeting Room 2", "language": "English", "desc": "If rhythm is a language, what can tap dance class teach us about language instruction? The presenter, a professional tap educator and Spanish teacher, will demonstrate what effective teaching strategies in a dance classroom can remind us about powerful instructional moves in a language class. Dance teachers help students build specific vocabulary, skills, and historical knowledge; improvise with language; study music; learn by moving; and develop the confidence to demonstrate complex skills on their own, whether in a rehearsed show (performance) or an unfamiliar class or audition scenario (proficiency). Throughout this session, we’ll use dance as a lens to discuss strong pedagogy, from building vocabulary to employing the gradual release model. And, yes, there will be tap dancing!"}, {"id": "s11", "day": "Friday", "date": "2026-10-30", "block": "B", "start": "10:30", "end": "11:30", "title": "Beyond the Language Barrier: Empowering Administrators to Champion World Language", "presenter": "Erica Pollard", "room": "Meeting Room 3", "language": "English", "desc": "Designed for administrators supervising world language programs without WL backgrounds, this session provides practical frameworks for meaningful support. Explore the MA WL Framework and ACTFL Core Practices to identify quality instruction through examples and observation protocols. Gain confidence recognizing proficiency-based instruction and communicative curriculum. Leave with concrete tools for effective observations and feedback conversations—no target language required! Bridge the gap between leadership and specialized content knowledge."}, {"id": "s12", "day": "Friday", "date": "2026-10-30", "block": "B", "start": "10:30", "end": "11:30", "title": "Empowering Through Language: Nurturing Voice, Community & Connection", "presenter": "Darcy Rogers (Organic World Language)", "room": "Session Room E", "language": "English", "desc": "In this session, participants will explore how multilingual classrooms can become spaces where students feel seen, valued, and empowered to contribute. Through real classroom examples, interactive strategies, and reflective practices, this session highlights how fostering authentic communication, student voice, and meaningful relationships cultivates a deep sense of belonging and ownership in the language classroom. Attendees will leave with practical ideas to build engaging, proficiency-centered environments where every student has a place, a voice, and a reason to communicate."}, {"id": "s13", "day": "Friday", "date": "2026-10-30", "block": "B", "start": "10:30", "end": "11:30", "title": "Queer Voices in the Spanish Curriculum: Inclusive Strategies from Novice to AP", "presenter": "Heather Moon", "room": "Session Room F", "language": "English", "desc": "This session explores practical ways to integrate queer and gender-diverse voices into the Spanish curriculum across all proficiency levels. Participants will examine strategies for incorporating inclusive language (including pronoun use), authentic resources such as podcasts and children’s literature, and culturally relevant materials, including Indigenous perspectives. The presenter will share classroom-ready examples, activities, and texts that promote representation while aligning with proficiency-based instruction. Participants will leave with concrete ideas and resources they can immediately implement. Time will also be dedicated to collaborative discussion, allowing attendees to share experiences and build a more inclusive, representative curriculum together."}, {"id": "s14", "day": "Friday", "date": "2026-10-30", "block": "B", "start": "10:30", "end": "11:30", "title": "Spoiler Alert!", "presenter": "Kara Jacobs", "room": "Salon A", "language": "Spanish", "desc": "Sometimes, it's okay to give students spoilers when watching a movie because, really, we are giving them input that will help grow their proficiency and increase their intercultural competence! This session will share a framework for a movie unit that is input driven. During the session, teachers will act as students and do some activities related to two movies. Examples will be in Spanish."}, {"id": "s15", "day": "Friday", "date": "2026-10-30", "block": "B", "start": "10:30", "end": "11:30", "title": "AI Meets Core Practices", "presenter": "Mike Travers", "room": "Salon B", "language": "English", "desc": ""}, {"id": "s16", "day": "Friday", "date": "2026-10-30", "block": "B", "start": "10:30", "end": "11:30", "title": "When Intermediate is Our Target: Working in the Messy Middle", "presenter": "Charlotte Gifford", "room": "Salon C", "language": "English", "desc": "This session explores practical strategies for the \"messy middle,\" where growth can feel slow, plateaus are common, and learners can get stuck! Participants will engage in hands-on activities across all three communicative modes, analyzing learning tasks that pair achievable targets with explicit instruction on how to level up. By focusing on what students need to perform at the next level, teachers can help learners bridge the performance gap while laying a foundation for future Advanced proficiency. The session emphasizes mapping and modeling success: participants will use sample performances to clarify targets, make progress visible, and guide learners in consciously expanding their language production."}, {"id": "s17", "day": "Friday", "date": "2026-10-30", "block": "C", "start": "13:15", "end": "14:15", "title": "How to Build Language, Empathy, and Global Awareness with SDG-Driven Texts", "presenter": "Kristin Shoaf", "room": "Meeting Room 1", "language": "English", "desc": "Sustainable Development Goals (SDGs) provide an authentic cultural lens to explore the people, choices, and challenges of our world. Carefully selected texts, including short stories, articles, film excerpts, and student-friendly nonfiction, anchor SDG instruction in language, meaning, and human experience. Participants will explore how SDGs can be used to foster deeper comprehension, discussion, and empathy while naturally supporting language goals in the interpretive, interpersonal, and presentational modes. This session provides examples of tiered activities and how to develop interculturality and empathy at different proficiency levels for themes including identity, responsibility, and global citizenship."}, {"id": "s18", "day": "Friday", "date": "2026-10-30", "block": "C", "start": "13:15", "end": "14:15", "title": "Celebrating ALL Languages with the Silver Seal", "presenter": "Jessica Haxhi", "room": "Meeting Room 2", "language": "English", "desc": "A \"Silver Seal Award\" for 8th graders on the pathway to the Seal of Biliteracy in high school celebrates all languages that students speak, focuses on proficiency, and promotes continued study in high school. This session outlines the process, challenges, and successes of the first two years of implementation. Participants will leave with the tools to advocate for and implement a similar program in their schools."}, {"id": "s19", "day": "Friday", "date": "2026-10-30", "block": "C", "start": "13:15", "end": "14:15", "title": "From Policy to Practice: What's Next for Massachusetts World Languages?", "presenter": "Andy McDonie", "room": "Meeting Room 3", "language": "English", "desc": "This session supports world language leaders in translating state priorities into effective local program leadership. Aligned with the Massachusetts World Languages Curriculum Framework and current DESE initiatives, it examines emerging issues affecting program planning, access, proficiency, pathways, and the Seal of Biliteracy. Participants will strengthen their understanding of how these priorities intersect and identify opportunities to leverage DESE resources and partnerships to support high-quality, sustainable world language programs."}, {"id": "s20", "day": "Friday", "date": "2026-10-30", "block": "C", "start": "13:15", "end": "14:15", "title": "Teacher Recruitment Strategies That Build Sustainable World Language Programs", "presenter": "Mellissa Walles (Idioma)", "room": "Session Room E", "language": "English", "desc": "Language programs succeed when recruitment becomes a shared responsibility rather than a single department initiative. This interactive session explores grassroots initiatives that cultivate interest in language teaching among high school students, university candidates, paraprofessionals, heritage language speakers, and community members. Participants will examine successful recruitment strategies that strengthen the educator pipeline, including student leadership programs, alternate route teaching certification & licensure pathways, university partnerships, and community engagement efforts. Throughout this session, attendees will explore strategies for recruiting world language teachers towards creating a long-term vision for world language program sustainability."}, {"id": "s21", "day": "Friday", "date": "2026-10-30", "block": "C", "start": "13:15", "end": "14:15", "title": "Teaching Italian and French through novels in the classroom!", "presenter": "Monica Canetta", "room": "Session Room F", "language": "Italian and French", "desc": "This session presents several novels used in both the Italian and French classroom. We will share the plot of each novel along with ideas and activities for teaching the target language through literature. Participants will learn how to draw on what is already embedded in each novel—culture, geography, food, social issues, and politics—to deepen student engagement. For each novel, participants will examine the content, engage in discussion, and explore adaptable classroom activities."}, {"id": "s22", "day": "Friday", "date": "2026-10-30", "block": "C", "start": "13:15", "end": "14:15", "title": "The Write Moves: Strengthen Novice & Intermediate Presentational Writing", "presenter": "Amanda Holcombe", "room": "Salon C", "language": "English", "desc": "What do Novice & Intermediate learners have in common? They both need explicit writing instruction to move up the proficiency ladder. The Writing Revolution (Hochman & Wexler) offers a sequence of strategies that scaffold student writing to align naturally with proficiency benchmarks. When writing instruction is explicit, scaffolded, and accessible, every student has a pathway to express their voice. Session participants will see how TWR's core tools map onto proficiency descriptors for Novice through Intermediate and leave with classroom-ready strategies they can apply and adapt immediately."}, {"id": "s23", "day": "Friday", "date": "2026-10-30", "block": "D", "start": "14:30", "end": "15:30", "title": "Making Neurodivergent Voices Visible in the World Language Curriculum", "presenter": "Christina Toro", "room": "Meeting Room 1", "language": "English", "desc": "This session explores how world language educators can incorporate neurodivergent voices into proficiency-based curricula. Participants will examine thematic units on play, friendship, and work; explore strategies grounded in Universal Design for Learning and neuro-affirming practices; and analyze sample texts to consider how representation, identity, and inclusive instructional design can strengthen engagement and belonging for all learners."}, {"id": "s24", "day": "Friday", "date": "2026-10-30", "block": "D", "start": "14:30", "end": "15:30", "title": "From Idea to Impact: Launching a Districtwide World Languages Week", "presenter": "Katy Cen", "room": "Meeting Room 2", "language": "English", "desc": "This session shares how one district launched its first district-wide World Languages Week and Showcase, bringing together over 700 students, educators, and community partners. Participants will learn how to build a sustainable, student-centered model that fosters a strong sense of belonging by celebrating multilingualism as an asset and highlighting students' home languages alongside their World Language learning. Attendees will leave with actionable tools and adaptable structures to implement similar initiatives in their own communities, regardless of size or resources."}, {"id": "s25", "day": "Friday", "date": "2026-10-30", "block": "D", "start": "14:30", "end": "15:30", "title": "AI-Supported Personalized Storybooks and Interpersonal Communication", "presenter": "Adriana Gonzalez", "room": "Meeting Room 3", "language": "English", "desc": "This interactive workshop explores how artificial intelligence can support language learning while fostering belonging. Participants will explore how to create personalized storybooks using Gemini that position students as central characters, connecting language to their identities and culturally relevant experiences while supporting interpretive skills. They will also engage in a guided activity to design a simple AI-based communication task for interpersonal practice aligned with ACTFL proficiency levels."}, {"id": "s26", "day": "Friday", "date": "2026-10-30", "block": "D", "start": "14:30", "end": "15:30", "title": "The Wi-Fi Is Down: Quick Pivots for Real Communication", "presenter": "Kate Sanders (Wayside)", "room": "Session Room E", "language": "English", "desc": "When technology fails, instruction doesn’t have to. This interactive session equips world language educators with in-the-moment, no-tech strategies to sustain proficiency-based, communicative learning. Aligned to ACTFL World-Readiness Standards, participants will experience adaptable routines that support interpretive, interpersonal, and presentational communication while centering student voice and cultural perspectives. Grounded in research-based practices like comprehensible input and scaffolded communication, this session provides ready-to-use activities, a rapid decision-making framework, and a personalized pivot plan to ensure learning continues seamlessly in any context."}, {"id": "s27", "day": "Friday", "date": "2026-10-30", "block": "D", "start": "14:30", "end": "15:30", "title": "Bridging Voices: Negotiating Meaning Across Heritage and L2 Learners", "presenter": "Viktoria Hackbarth", "room": "Session Room F", "language": "English", "desc": "In recent years, language classrooms have increasingly brought together learners with diverse linguistic backgrounds, including heritage speakers and second language (L2) learners. While this diversity presents pedagogical challenges, our focus is on the opportunities it creates for rich interaction, meaning negotiation, and identity exploration. This presentation examines the dynamics of mixed-proficiency and mixed-background classrooms, focusing on how learners with differing linguistic competencies engage with one another in meaningful interaction."}, {"id": "s28", "day": "Friday", "date": "2026-10-30", "block": "C+D", "start": "13:15", "end": "15:30", "title": "Enacting Anticolonial and Antiracist Language Pedagogies", "presenter": "L. J. Randolph Jr.", "room": "Salon A", "language": "English", "desc": "Anticolonial and antiracist pedagogical frameworks allow us to intentionally confront and dismantle barriers to inclusive language learning. In this workshop, we will first examine how language education is connected to broader, societal-level antiracist and anticolonial movements. We will then explore specific strategies for engaging learners with such pedagogies while also supporting language proficiency goals, with particular attention to novice and intermediate proficiency levels. Participants will leave with concrete ideas, activities, and frameworks that can be applied to a variety of languages, levels, ages, and instructional contexts."}, {"id": "s29", "day": "Friday", "date": "2026-10-30", "block": "C+D", "start": "13:15", "end": "15:30", "title": "Making Communication the Goal: Strategies for Interpersonal Speaking", "presenter": "Catherine Ritz and Luna Hogan", "room": "Salon B", "language": "English", "desc": "This interactive workshop helps educators strengthen students’ skills in the Interpersonal mode by focusing on practical, classroom-ready strategies that promote authentic communication. Participants will explore techniques designed to move learners beyond speaking for practice toward speaking for meaning, supported by real classroom examples that illustrate each approach. Attendees will actively experience many of the strategies themselves, ensuring they leave with tools they can implement immediately. The workshop also introduces a clear framework for designing and using engaging communicative tasks that foster purposeful interaction, build student confidence, and increase meaningful target-language use."}, {"id": "s30", "day": "Friday", "date": "2026-10-30", "block": "D", "start": "14:30", "end": "15:30", "title": "Scaffold to Stretch: Designing Tasks for Access and Challenge", "presenter": "Evan Greenwald", "room": "Salon C", "language": "English", "desc": "This session explores how intentional scaffolds and stretch opportunities support learner variability in language classrooms. Participants will examine common performance barriers, distinguish supports from extensions, and learn how to design accessible yet rigorous tasks aligned to performance targets."}, {"id": "s31", "day": "Friday", "date": "2026-10-30", "block": "E", "start": "16:00", "end": "17:00", "title": "CI: It’s Not Just About Input", "presenter": "Amy Marshall", "room": "Meeting Room 1", "language": "English", "desc": "Comprehensible Input is often misunderstood as teacher talk delivered to passive students. This session reframes CI as a dynamic, interactive loop where input leads to communication and communication deepens input. Through live demonstrations in Mandarin, participants will engage as learners and unpack how meaning is built without translation. Techniques like circling, triangling, and personalization show how input leads to guided interaction and supported output. Whether new to CI or refining practice, teachers will leave with a clearer understanding of how to create classrooms where language is co-constructed, comprehensible, and alive."}, {"id": "s32", "day": "Friday", "date": "2026-10-30", "block": "E", "start": "16:00", "end": "17:00", "title": "All Levels, One Community: Building Belonging in Mixed-Level Classes", "presenter": "Xuemei Li", "room": "Meeting Room 2", "language": "English", "desc": "This interactive session explores practical strategies for supporting mixed-level (CP and Honors or CP, Honors and AP) learners in the same Mandarin classroom to foster a strong sense of belonging. Grounded in proficiency-based teaching, participants will examine scaffolding techniques, differentiated input, and inclusive practices that enable all students to engage meaningfully in the target language. Through modeling, collaborative discussion, and shared resources, attendees will gain concrete strategies to increase access, confidence, and participation while building an inclusive classroom community."}, {"id": "s33", "day": "Friday", "date": "2026-10-30", "block": "E", "start": "16:00", "end": "17:00", "title": "Culture Counts: Turning Student Identity Into Classroom Connection", "presenter": "Bailey Mahoney", "room": "Meeting Room 3", "language": "English", "desc": "This interactive presentation is focused on student culture as a means to increase connection and inclusivity within the classroom. Throughout the session, we will guide you through the process of identifying the cultures within your classroom, selecting authentic resources for all proficiency levels, supplementing your current curriculum, and creating different activities to engage learners. Participants will come away with concrete examples and tools to get started right away!"}, {"id": "s34", "day": "Friday", "date": "2026-10-30", "block": "E", "start": "16:00", "end": "17:00", "title": "Update for the 2027 World Language AP Courses and Exams", "presenter": "Ken Stewart (Lingco)", "room": "Session Room E", "language": "English", "desc": "Feeling anxious about the new AP exams? In this session, we'll examine the changes to the courses and exams as well as share strategies for success. Participants will discuss the new rubrics, sample task items for the free-response and interpretive sections of the exam. Special attention will be giving to the new project and follow-up Q&A. Relevant examples and classroom applications will be provided for Spanish, French, German and Italian."}, {"id": "s35", "day": "Friday", "date": "2026-10-30", "block": "E", "start": "16:00", "end": "17:00", "title": "Pop Culture Meets Accessibility: Integrating UDL, Music, and Language Teaching", "presenter": "Angelica Avcikurt", "room": "Session Room F", "language": "Spanish", "desc": "Music is an excellent means to foster a sense of community and belonging while enhancing cultural competence in the target language. This interactive session presents activities based on three popular music genres of Latin America and how they can be made more accessible by incorporating principles of Universal Design for Learning (UDL). The session includes creative hands-on activities with three genres of music: Cuban Punk, Mexican Corridos, and Puerto Rican Plena. The activities, designed with UDL principles to make the materials more accessible to students, explore these genres' historical origins, popular themes, and social contexts, including the writing of original lyrics, to create an inclusive learning environment."}, {"id": "s36", "day": "Friday", "date": "2026-10-30", "block": "E", "start": "16:00", "end": "17:00", "title": "The Science of Learning Meets Language Acquisition", "presenter": "Maureen Magnan", "room": "Salon A", "language": "English", "desc": "Students often understand language during a lesson but forget it days later. Research from the science of learning shows that strategies like retrieval practice, spaced repetition, interleaving, and low-stakes assessments strengthen memory and deepen understanding. In this interactive session, participants will explore practical ways to integrate these brain-based strategies into daily language instruction. Teachers will leave with practical, adaptable routines that increase engagement and support long-term retention."}, {"id": "s37", "day": "Friday", "date": "2026-10-30", "block": "E", "start": "16:00", "end": "17:00", "title": "Clarity in Action: Communicative Classrooms that Deliver", "presenter": "Tim Eagan", "room": "Salon B", "language": "English", "desc": "This session explores how teacher clarity can transform daily instruction. The presenter will examine how clear learning targets aligned to interpretive, interpersonal, and presentational communication support student progress and equity. Participants will explore classroom-ready examples supported by clear success criteria that answer the question: “How will students know they have learned it?” Attendees will leave with ready-to-use routines, sample tasks, and adaptable templates they can implement immediately to make learning visible, measurable, and communicative."}, {"id": "s38", "day": "Friday", "date": "2026-10-30", "block": "E", "start": "16:00", "end": "17:00", "title": "Empowering Lifelong WL Learners with Feedback, Reflection, & Self-Assessment", "presenter": "Denise Wagstaff", "room": "Salon C", "language": "English", "desc": "This session explores practical ways to empower beginning and intermediate language learners through feedback, reflection, and self-assessment. Participants will examine strategies that move students beyond a focus on grades toward meaningful engagement with their own growth. Using classroom-ready tools—such as reflective prompts, Can-Do Statements, and student-friendly feedback routines—learners can better understand their progress, set goals, and document their learning. Attendees will leave with adaptable practices to help students collect evidence of proficiency and build confidence and appreciation for their language learning journey."}, {"id": "s39", "day": "Saturday", "date": "2026-10-31", "block": "WS", "start": "09:15", "end": "12:15", "title": "Workshop #1: Humanizing and Liberating Curricular Frameworks for Language Education", "presenter": "L.J. Randolph", "room": "Meeting Room 1", "language": "English", "desc": "This workshop begins by identifying and unpacking ways that language learning can often be a dehumanizing experience for learners (e.g., abuse of AI, use of capitalist language in programming and curriculum, and productivity-centered models of assessment). Then, building on theoretical foundations informed by transdisciplinary frameworks and liberation-centered movements, the workshop will link theory to practice across curriculum, instruction, and assessment in language education. Through guided reflection, discussion, and hands-on activities, participants will not only walk away with concrete strategies but also with a renewed perspective on the humanizing, transformative power of language learning."}, {"id": "s40", "day": "Saturday", "date": "2026-10-31", "block": "WS", "start": "09:15", "end": "12:15", "title": "Workshop #2: Leading for Proficiency", "presenter": "Catherine Ritz", "room": "Salon B", "language": "English", "desc": "This interactive workshop for aspiring and current program leaders focuses on strengthening leadership practice and driving measurable improvement. Participants will examine the qualities of effective leadership, reflect on their own practice, and set professional growth goals. The workshop also explores how to review program performance-to-proficiency targets and develop strategic plans that define mission, annual goals, and action steps. In addition, participants will learn practical approaches to supporting teachers through supervision and evaluation, conducting effective observations and feedback conversations, planning productive department meetings, and designing professional development aligned with program priorities. The workshop also offers opportunities to network with fellow leaders, fostering collaboration, shared insight, and practical takeaways that can be implemented immediately."}, {"id": "s41", "day": "Saturday", "date": "2026-10-31", "block": "WS", "start": "09:15", "end": "12:15", "title": "Workshop #3: Practical Frameworks for Building Inclusive, Proficiency-Aligned Classrooms", "presenter": "Joshua Cabral", "room": "Salon A", "language": "English", "desc": "Teachers will learn practical, repeatable frameworks for building inclusive classrooms grounded in proficiency-based instruction. Participants will gain insights on designing purposeful, communicative tasks across the interpretive, interpersonal, and presentational modes while increasing access and meaningful participation for all learners. We will unpack scaffolding strategies for each mode, teaching grammar in context to support communication, and designing effective performance assessments. Emphasis will be placed on clear routines, aligned expectations, and sustainable planning practices that work across languages and levels. Teachers will leave with adaptable tools and ready-to-implement ideas."}, {"id": "s42", "day": "Saturday", "date": "2026-10-31", "block": "WS", "start": "09:15", "end": "12:15", "title": "Workshop #4: Greenhouse Leadership: Designing a World Language Program where Every Student Can Bloom", "presenter": "Jessica Haxhi", "room": "Meeting Room 2", "language": "English", "desc": "Just as a greenhouse provides the ideal environment for growth, a successful world language program requires intentional structures to cultivate equity, joy, and proficiency. This session explores the practical architecture behind strong program design—from building a shared vision and writing curriculum to setting performance targets and establishing collaborative systems. We’ll discuss how focused professional learning around key instructional practices can build teacher capacity and ensure that all students—including native, heritage, and world language learners—feel seen, supported, and capable of success. Participants will have dedicated time to review their own programs against the examples given, collaborate with peers, and ask questions of the presenter."}, {"id": "s43", "day": "Saturday", "date": "2026-10-31", "block": "WS", "start": "09:15", "end": "12:15", "title": "Workshop #5: Tools, Not Rules: Reframing Grammar Instruction", "presenter": "Mike Travers & Timothy Chávez", "room": "Salon C", "language": "English", "desc": "One of ACTFL's Guiding Principles calls on us to teach grammar as a concept in context, but putting that principle into practice is often easier said than done. There's no doubt that grammar instruction is essential, but how we go about that instruction needs to look different as we shift from a focus on grammar knowledge to a focus on student proficiency. In this interactive workshop, we will explore how to bridge the gap between best practices and classroom reality. Participants will gain practical experience designing lessons using structured input and other processing-focused strategies that help learners process grammar for meaning. From there, we will explore how to scaffold tasks for learners and gradually move toward independent use of grammar in speaking and writing. Teachers will leave with adaptable frameworks, ready-to-use strategies, and concrete ideas for supporting Novice and Intermediate learners in making grammar a tool for authentic communication."}], "breaks": [{"day": "Friday", "start": "07:00", "end": "09:00", "label": "Registration and Exhibitors", "room": "Foyer"}, {"day": "Friday", "start": "10:00", "end": "10:30", "label": "Exhibit Hall Break", "room": ""}, {"day": "Friday", "start": "11:30", "end": "13:00", "label": "Lunch + Exhibit Hall Break + Panel Discussion/Student Presentation", "room": "Visions Restaurant / Prism Auditorium"}, {"day": "Friday", "start": "15:30", "end": "16:00", "label": "Exhibit Hall Break", "room": ""}, {"day": "Friday", "start": "17:15", "end": "18:30", "label": "Member Reception", "room": "Visions Restaurant"}, {"day": "Friday", "start": "18:30", "end": "20:00", "label": "Social Activities", "room": ""}, {"day": "Saturday", "start": "07:00", "end": "08:00", "label": "Registration", "room": "Foyer"}, {"day": "Saturday", "start": "08:00", "end": "09:00", "label": "Immersion Breakfast", "room": "Visions Restaurant"}, {"day": "Saturday", "start": "12:30", "end": "14:00", "label": "Business & Awards Luncheon", "room": "Visions Restaurant"}]};
-const SESSIONS = DATA.sessions;
-const BREAKS = DATA.breaks;
-const BLOCK_LABELS = {"A": "Session A \u00b7 9:00 \u2013 10:00 AM", "B": "Session B \u00b7 10:30 \u2013 11:30 AM", "C": "Session C \u00b7 1:15 \u2013 2:15 PM", "C+D": "Full-Length Workshops (span Sessions C & D) \u00b7 1:15 \u2013 3:30 PM", "D": "Session D \u00b7 2:30 \u2013 3:30 PM", "E": "Session E \u00b7 4:00 \u2013 5:00 PM", "WS": "Deep Dive Workshops \u00b7 9:15 \u2013 12:15 PM"};
-const TIMELINE = {"Friday": [["break", 0], ["block", "A"], ["break", 1], ["block", "B"], ["break", 2], ["block", "C"], ["block", "C+D"], ["block", "D"], ["break", 3], ["block", "E"], ["break", 4], ["break", 5]], "Saturday": [["break", 6], ["break", 7], ["block", "WS"], ["break", 8]]};
-const BLOCK_FILTER_OPTIONS = {
-  "Friday": [["","All time blocks"],["A","Session A (9:00–10:00)"],["B","Session B (10:30–11:30)"],
-             ["C","Session C (1:15–2:15)"],["C+D","Full Workshops (1:15–3:30)"],
-             ["D","Session D (2:30–3:30)"],["E","Session E (4:00–5:00)"]],
-  "Saturday": [["","All workshops"],["WS","Deep Dive Workshops (9:15–12:15)"]]
-};
-
-const FEEDBACK_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSc7vybgZTLB3XjepSjHbfSw_HEpnacEtvtB7GOOcRGOaKH-bw/viewform?usp=sharing";
-
-let currentDay = "Friday";
-
-const STORAGE_KEY = "mafla2026_bookmarks";
-function getBookmarks() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
-  catch(e) { return {}; }
-}
-function setBookmarksStore(b) { localStorage.setItem(STORAGE_KEY, JSON.stringify(b)); }
-let bookmarks = getBookmarks();
-
-function toggleBookmark(id) {
-  bookmarks[id] = !bookmarks[id];
-  if (!bookmarks[id]) delete bookmarks[id];
-  setBookmarksStore(bookmarks);
-  render();
-}
-
-function fmtTime(t) {
-  let [h,m] = t.split(":").map(Number);
-  const ampm = h >= 12 ? "PM" : "AM";
-  let h12 = h % 12; if (h12 === 0) h12 = 12;
-  return h12 + (m ? ":" + String(m).padStart(2,"0") : ":00") + " " + ampm;
-}
-
-function timesOverlap(a, b) {
-  if (a.date !== b.date) return false;
-  return a.start < b.end && b.start < a.end;
-}
-
-function icsEscape(str) {
-  return (str||"").replace(/\\/g,"\\\\").replace(/\n/g,"\\n").replace(/,/g,"\\,").replace(/;/g,"\\;");
-}
-
-function buildICSEvent(s) {
-  const dateCompact = s.date.replace(/-/g,"");
-  const dtStart = "DTSTART;TZID=America/New_York:" + dateCompact + "T" + s.start.replace(":","") + "00";
-  const dtEnd = "DTEND;TZID=America/New_York:" + dateCompact + "T" + s.end.replace(":","") + "00";
-  const desc = icsEscape((s.desc || "Description not yet available.") + " Presenter(s): " + (s.presenter || "TBA"));
-  return [
-    "BEGIN:VEVENT",
-    "UID:" + s.id + "-mafla2026@mafla.org",
-    dtStart,
-    dtEnd,
-    "SUMMARY:" + icsEscape(s.title),
-    "LOCATION:" + icsEscape(s.room),
-    "DESCRIPTION:" + desc,
-    "END:VEVENT"
-  ].join("\r\n");
-}
-
-const VTIMEZONE = [
-  "BEGIN:VTIMEZONE",
-  "TZID:America/New_York",
-  "BEGIN:DAYLIGHT",
-  "TZOFFSETFROM:-0500",
-  "TZOFFSETTO:-0400",
-  "TZNAME:EDT",
-  "DTSTART:19700308T020000",
-  "RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU",
-  "END:DAYLIGHT",
-  "BEGIN:STANDARD",
-  "TZOFFSETFROM:-0400",
-  "TZOFFSETTO:-0500",
-  "TZNAME:EST",
-  "DTSTART:19701101T020000",
-  "RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU",
-  "END:STANDARD",
-  "END:VTIMEZONE"
-].join("\r\n");
-
-function downloadICS(filename, events) {
-  const content = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//MAFLA 2026//Session Browser//EN",
-    "CALSCALE:GREGORIAN",
-    VTIMEZONE,
-    events.join("\r\n"),
-    "END:VCALENDAR"
-  ].join("\r\n");
-  const blob = new Blob([content], {type: "text/calendar;charset=utf-8"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-function addSingleToCalendar(id) {
-  const s = SESSIONS.find(x => x.id === id);
-  downloadICS(s.title.replace(/[^a-z0-9]+/gi,"_").slice(0,40) + ".ics", [buildICSEvent(s)]);
-}
-
-function downloadFullSchedule() {
-  const chosen = SESSIONS.filter(s => bookmarks[s.id]);
-  if (!chosen.length) return;
-  downloadICS("my_mafla2026_schedule.ics", chosen.map(buildICSEvent));
-}
-
-function openModal(id) {
-  const s = SESSIONS.find(x => x.id === id);
-  const isBm = !!bookmarks[id];
-  const modal = document.getElementById("modalContent");
-  modal.innerHTML = `
-    <button class="modal-close" onclick="closeModal()">&times;</button>
-    <h2>${s.title}</h2>
-    <div class="meta-row"><strong>${s.day}, ${fmtTime(s.start)} – ${fmtTime(s.end)}</strong> &middot; ${s.room}</div>
-    <div class="meta-row">Presenter(s): ${s.presenter || "TBA"}</div>
-    <div class="meta-row">Language: ${s.language}</div>
-    <div class="desc">${s.desc || "Description not yet available — check the printed conference program for details."}</div>
-    <div class="modal-actions">
-      <button class="btn ${isBm ? 'secondary' : ''}" onclick="toggleBookmark('${s.id}'); openModal('${s.id}');">${isBm ? '★ Bookmarked' : '☆ Bookmark this session'}</button>
-      <button class="btn secondary" onclick="addSingleToCalendar('${s.id}')">Add to Calendar (.ics)</button>
-      <a class="btn feedback-btn" href="${FEEDBACK_FORM_URL}" target="_blank" rel="noopener">Give Feedback</a>
-    </div>
-  `;
-  document.getElementById("modalOverlay").classList.add("open");
-}
-function closeModal() { document.getElementById("modalOverlay").classList.remove("open"); }
-document.getElementById("modalOverlay").addEventListener("click", (e) => {
-  if (e.target.id === "modalOverlay") closeModal();
-});
-
-function populateLangFilter() {
-  const langs = Array.from(new Set(SESSIONS.map(s => s.language))).sort();
-  const sel = document.getElementById("langFilter");
-  sel.innerHTML = '<option value="">All languages</option>';
-  langs.forEach(l => {
-    const opt = document.createElement("option");
-    opt.value = l; opt.textContent = l;
-    sel.appendChild(opt);
-  });
-}
-
-function populateBlockFilter() {
-  const sel = document.getElementById("blockFilter");
-  sel.innerHTML = "";
-  BLOCK_FILTER_OPTIONS[currentDay].forEach(([val,label]) => {
-    const opt = document.createElement("option");
-    opt.value = val; opt.textContent = label;
-    sel.appendChild(opt);
-  });
-}
-
-function setDay(day) {
-  currentDay = day;
-  document.querySelectorAll(".day-tab").forEach(b => b.classList.toggle("active", b.dataset.day === day));
-  populateBlockFilter();
-  render();
-}
-
-let showBookmarkedOnly = false;
-
-function matchesFilters(s, query, block, lang) {
-  if (s.day !== currentDay) return false;
-  if (showBookmarkedOnly && !bookmarks[s.id]) return false;
-  if (block && s.block !== block) return false;
-  if (lang && s.language !== lang) return false;
-  if (query) {
-    const hay = (s.title + " " + s.presenter + " " + s.room).toLowerCase();
-    if (!hay.includes(query.toLowerCase())) return false;
-  }
-  return true;
-}
-
-function render() {
-  const query = document.getElementById("searchBox").value.trim();
-  const block = document.getElementById("blockFilter").value;
-  const lang = document.getElementById("langFilter").value;
-
-  const listEl = document.getElementById("sessionList");
-  listEl.innerHTML = "";
-  let anyShown = false;
-
-  const timeline = TIMELINE[currentDay];
-  timeline.forEach(entry => {
-    if (entry[0] === "break") {
-      const br = BREAKS[entry[1]];
-      const row = document.createElement("div");
-      row.className = "break-row";
-      row.textContent = br.label + " · " + fmtTime(br.start) + " – " + fmtTime(br.end) + (br.room ? " · " + br.room : "");
-      listEl.appendChild(row);
-      return;
-    }
-    const blk = entry[1];
-    const sessionsInBlock = SESSIONS.filter(s => s.block === blk && matchesFilters(s, query, block, lang));
-    if (!sessionsInBlock.length) return;
-    anyShown = true;
-
-    const header = document.createElement("div");
-    header.className = "block-header";
-    header.textContent = BLOCK_LABELS[blk];
-    listEl.appendChild(header);
-
-    const grid = document.createElement("div");
-    grid.className = "grid";
-    sessionsInBlock.forEach(s => {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.onclick = (e) => { if (!e.target.classList.contains("star-btn")) openModal(s.id); };
-      const isBm = !!bookmarks[s.id];
-      card.innerHTML = `
-        <button class="star-btn ${isBm ? 'bookmarked' : ''}" onclick="toggleBookmark('${s.id}')">${isBm ? '★' : '☆'}</button>
-        <h3>${s.title}</h3>
-        <div class="meta"><strong>${fmtTime(s.start)} – ${fmtTime(s.end)}</strong> &middot; ${s.room}</div>
-        <div class="meta">${s.presenter || "TBA"}</div>
-        <div class="badges"><span class="badge lang">${s.language}</span></div>
-      `;
-      grid.appendChild(card);
-    });
-    listEl.appendChild(grid);
-  });
-
-  document.getElementById("noResults").style.display = anyShown ? "none" : "block";
-  renderMySchedule();
-}
-
-function renderMySchedule() {
-  const chosen = SESSIONS.filter(s => bookmarks[s.id]).sort((a,b) => (a.date+a.start).localeCompare(b.date+b.start));
-  const el = document.getElementById("myScheduleContent");
-  if (!chosen.length) {
-    el.innerHTML = '<p class="empty">You haven\'t bookmarked any sessions yet. Click the star on any session to add it here.</p>';
-    return;
-  }
-  let conflicts = [];
-  for (let i=0;i<chosen.length;i++){
-    for (let j=i+1;j<chosen.length;j++){
-      if (timesOverlap(chosen[i], chosen[j])) conflicts.push([chosen[i], chosen[j]]);
-    }
-  }
-  let html = "";
-  if (conflicts.length) {
-    html += `<div class="conflict-warning">⚠️ Time conflict: ` + conflicts.map(c => `"${c[0].title}" overlaps with "${c[1].title}"`).join("; ") + `</div>`;
-  }
-  ["Friday","Saturday"].forEach(day => {
-    const dayChosen = chosen.filter(s => s.day === day);
-    if (!dayChosen.length) return;
-    html += `<h3>${day}</h3><ul>` + dayChosen.map(s => `
-      <li>
-        <span><strong>${fmtTime(s.start)}–${fmtTime(s.end)}</strong> — ${s.title} (${s.room})</span>
-        <button class="btn secondary small" onclick="toggleBookmark('${s.id}')">Remove</button>
-      </li>`).join("") + "</ul>";
-  });
-  html += `<div class="my-actions">
-    <button class="btn" onclick="downloadFullSchedule()">Download My Full Schedule (.ics — adds all ${chosen.length} to your calendar)</button>
-  </div>`;
-  el.innerHTML = html;
-}
-
-document.getElementById("searchBox").addEventListener("input", render);
-document.getElementById("blockFilter").addEventListener("change", render);
-document.getElementById("langFilter").addEventListener("change", render);
-document.getElementById("bookmarkToggle").addEventListener("click", (e) => {
-  showBookmarkedOnly = !showBookmarkedOnly;
-  e.target.classList.toggle("active", showBookmarkedOnly);
-  render();
-});
-
-populateLangFilter();
-populateBlockFilter();
-render();
-
-if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js").catch(() => {});
-  });
-}
-</script>
 </body>
 </html>

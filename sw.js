@@ -1,5 +1,6 @@
 const CACHE_NAME = "mafla2026-v1";
 const ASSETS = [
+  "./schedule.html",
   "./index.html",
   "./manifest.json",
   "./icon-192.png",

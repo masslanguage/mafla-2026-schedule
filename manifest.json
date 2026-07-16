@@ -2,7 +2,7 @@
   "name": "MAFLA 2026 Conference — Session Browser",
   "short_name": "MAFLA 2026",
   "description": "Browse, bookmark, and add MAFLA 2026 conference sessions to your calendar.",
-  "start_url": "./index.html",
+  "start_url": "./schedule.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
